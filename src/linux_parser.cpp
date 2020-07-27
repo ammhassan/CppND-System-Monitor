@@ -89,7 +89,7 @@ float LinuxParser::MemoryUtilization() {
     }
   }
   memTotalUsed = memTotal - memFree;
-  memUtilization = memTotalUsed / memTotal;
+  memUtilization = static_cast<float>(memTotalUsed) / memTotal;
   return memUtilization; 
   }
 
