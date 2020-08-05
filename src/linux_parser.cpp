@@ -156,7 +156,7 @@ float LinuxParser::PidCpuUtilization(int pid) {
     cpuUsage = 0.0;
   }
   else {
-    cpuUsage = (totalTime / sysconf(_SC_CLK_TCK)) / elapsedTime_sec;
+    cpuUsage = static_cast<float>(totalTime / sysconf(_SC_CLK_TCK)) / elapsedTime_sec;
   }
   return cpuUsage;
 }
@@ -168,7 +168,11 @@ long LinuxParser::ActiveJiffies() {
   if (filestream.is_open()) {
     std::getline(filestream, line);
     std::istringstream linestream(line);
-    linestream >> key>> sysJiffiesString[0] >> sysJiffiesString[1] >> sysJiffiesString[2] >> sysJiffiesString[3] >> sysJiffiesString[4] >> sysJiffiesString[5] >> sysJiffiesString[6] >> sysJiffiesString[7] >> sysJiffiesString[8] >> sysJiffiesString[9];
+    linestream >> key>> sysJiffiesString[0] >> sysJiffiesString[1] >>
+                        sysJiffiesString[2] >> sysJiffiesString[3] >> 
+                        sysJiffiesString[4] >> sysJiffiesString[5] >>
+                        sysJiffiesString[6] >> sysJiffiesString[7] >>
+                        sysJiffiesString[8] >> sysJiffiesString[9];
    }
    
   vector<long> sysJiffies;
@@ -241,18 +245,19 @@ string LinuxParser::Command(int pid) {
 
 string LinuxParser::Ram(int pid) {
   string line, key, value, unit;
+  long ram_Mb;
   std::ifstream filestream(kProcDirectory + std::to_string(pid) + "/" + "status");
   if (filestream.is_open()) {
     while (std::getline(filestream, line)) {
       std::istringstream linestream(line);
       while (linestream >> key >> value >> unit) {
         if (key == "VmSize:") {
-          return value;
+          ram_Mb = stoi(value) / 1000;
         }
       }
     }
   }
-   return value; 
+  return to_string(ram_Mb);
   }
 
 string LinuxParser::Uid(int pid) {
